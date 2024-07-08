@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Current Location with OpenStreetMap JSON</title>
+    <style>
+        #location {
+            white-space: pre;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Current Location JSON</h1>
+    <pre id="location"></pre>
+
+    <script>
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async function (position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+
+                        try {
+                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                            const data = await response.json();
+                            console.log('Location data:', data);
+
+                            // Display location details in JSON format
+                            const locationElement = document.getElementById('location');
+                            locationElement.textContent = JSON.stringify(data, null, 2);
+                        } catch (error) {
+                            console.error('Error fetching location details:', error);
+                            alert('Failed to fetch location details from OpenStreetMap.');
+                        }
+                    },
+                    function (error) {
+                        console.error('Error getting location:', error);
+                        alert('Error getting your location. Please try again.');
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        }
+
+        // Call getCurrentLocation() when the page loads
+        window.onload = function () {
+            getCurrentLocation();
+        };
+    </script>
+</body>
+
+</html>
